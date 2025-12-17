@@ -1,6 +1,11 @@
 import { R } from "../../../../../core/runtime.js";
-import { HeaderBar } from "./headerBar.js";
+import { HeaderBar } from "./components/headerBar.js";
 import { ModalUI } from "../../../../../services/modalWindow/ModalWindow.js";
+import { CamRecTask } from "./features/camRec.js";
+import { AssetItem } from "./components/AssetItem.js";
+import { PreviewTask } from "./features/PreviewTask.js";
+import { ImportTask } from "./features/ImportTask.js";
+import { renderCardsView, renderListView, renderEmptyState, updateView } from "./view.js";
 
 export class VideoAssetsPage {
   constructor() {
@@ -11,13 +16,15 @@ export class VideoAssetsPage {
 
     this.rowHeight = 32;
     
+    this.assets = [];     // array of asset metadata
+    this.items = [];     // UI objects linked to assets
+
 
     // Local UI state (NOT global)
-    this.mode = "list";       // "list" | "cards" | "wave"
-    this.isRecording = false; // later used for audio recording
+    this.mode = "list";       // "list" | "cards" 
     this.hoveredId = null;
     this.isDragOver = false;
-
+    this.assetsVersion = R.assetsVersion;
     // Header bar (event router)
     this.header = new HeaderBar({
       onMessage: msg => this.receive(msg)
@@ -36,22 +43,36 @@ export class VideoAssetsPage {
 
     // Handle recording toggle
     if (msg.role === "rec") {
-      this.isRecording = !this.isRecording;
+      
+      //this.createVideo();
+      
+      const task = new CamRecTask(this);
 
       ModalUI.show({
         title: "recording",
-        soze: "small",
+        size: "small",
         blocking: true,
-         content: (g, x, y, w, h) => {
-          g.fill(220);
-          g.textAlign(g.LEFT, g.TOP);
-          g.textSize(16);
-          g.text("Recording settings window\n(placeholder)", x, y);
-         }
-      });
+        content: (g, x, y, w, h) => task.draw(g, x, y, w, h)
+      }); 
       
       return;
     }
+
+    if (msg.role === "import") {
+
+      const task = new ImportTask(this);  
+      
+
+      ModalUI.show({
+        title: "Import Media",
+        size: "medium",
+        blocking: true,
+        content: (g, x, y, w, h) => task.draw(g, x, y, w, h) 
+      });
+
+      return;
+    }
+
 
     // Future actions:
     // if (msg.role === "sort:name") { ... }
@@ -79,14 +100,10 @@ export class VideoAssetsPage {
     this.header.update();
     this.isDragOver = R.ui.dragActive;
 
-    // Mode-specific updating
-    if (this.mode === "list") {
-      this.updateListView();
-    } else if (this.mode === "cards") {
-      this.updateCardsView();
-    } else if (this.mode === "wave") {
-      this.updateWaveView();
-    }
+    // 1. Sync newly imported assets
+    this.syncAssetsIfNeeded();
+
+    updateView(this);
   }
 
   // ─────────────────────────────────────────────
@@ -94,45 +111,45 @@ export class VideoAssetsPage {
   // ─────────────────────────────────────────────
   render(g) {
     g.push();
-    g.fill(25);
-    g.rect(this.x, this.y, this.w, this.h);
-    if(this.isDragOver) this.dragHighlight(g);
-    // Render header
-    this.header.render(g, this.mode);
 
-    // Render mode-specific content
-    if (this.mode === "list") {
-      this.renderListView(g);
-    } else if (this.mode === "cards") {
-      this.renderCardsView(g);
-    } else if (this.mode === "wave") {
-      this.renderWaveView(g);
+    this.header.render(g, this.mode);
+    if (this.assetsVersion === 0) {
+      renderEmptyState(g, this);
+      g.pop();
+      return;
     }
 
+    g.fill(25);
+    g.rect(this.x, this.y, this.w, this.h);
+    
+    if(this.isDragOver) this.dragHighlight(g);
+    // Render header
+    
+    // Render mode-specific content
+    if (this.mode === "list") {this.header.render(g, this.mode);
+      renderListView(g, this);
+    } else if (this.mode === "cards") {this.header.render(g, this.mode);
+      renderCardsView(g, this);
+    } 
+    
     g.pop();
   }
 
-  // ─────────────────────────────────────────────
-  // PLACEHOLDER RENDERERS (you fill these next)
-  // ─────────────────────────────────────────────
-  updateListView() {}
-  updateCardsView() {}
-  updateWaveView() {}
 
-  renderListView(g) {
-    g.fill(180);
-    g.text("List View", this.x + 20, this.y + 80);
+
+  syncAssetsIfNeeded() {
+
+    // If no change → do nothing
+    if (this.assetsVersion !== R.assetsVersion) { 
+      this.assetsVersion = R.assetsVersion;
+      this.assets = [...R.assets.video];
+      this.items = this.assets.map(asset => new AssetItem(asset)); 
+    }
+
+
   }
 
-  renderCardsView(g) {
-    g.fill(180);
-    g.text("Cards View", this.x + 20, this.y + 80);
-  }
 
-  renderWaveView(g) {
-    g.fill(180);
-    g.text("Waveform View", this.x + 20, this.y + 80);
-  }
 
   dragHighlight(g) {
     g.push();
@@ -158,7 +175,37 @@ export class VideoAssetsPage {
   
 
   }
+
+  // ─────────────────────────────────────────────
+  // INPUT EVENTS
+  // ─────────────────────────────────────────────
+
+  onHover(mx, my) {
+    for (let item of this.items) item.onHover(mx, my);
+  }
+
+  onClick(mx, my) {
+    for (let item of this.items) {
+      if (item.onClick(mx, my)) return true;
+    }
+  }
+
+  onDoubleClick(mx, my) {
+    for (let item of this.items) {
+      if (item.onDoubleClick?.(mx, my)) return true;
+    }
+  }
+
+  onKeyPress(key) {
+    for (let item of this.items) {
+      if (item.editingName) item.onKeyPress(key);
+    }
+  }
+
+
 }
+
+
 
 
 

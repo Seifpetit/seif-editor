@@ -2,7 +2,7 @@
 //  Toaster.js  — lightweight notification system
 // ─────────────────────────────────────────────
 import { R } from "../core/runtime.js";
-
+import { ModalUI } from "./modalWindow/ModalWindow.js";
 export class Toaster {
   constructor() {
     this.toast = null;   // active toast object
@@ -41,7 +41,7 @@ export class Toaster {
     this.show({ text, status: "warning", autoCloseMs: 1600 });
   }
 
-  showError(text) {
+  showError(text) { R.ui.state.error = text;
     this.show({ text, status: "error", block: true, autoCloseMs: null });
   }
 
@@ -58,6 +58,7 @@ export class Toaster {
 
   clear() {
     this.toast = null;
+    R.ui.state.error = false;
     R.ui.modalLock = false;
   }
   // ─────────────────────────────────────────────
@@ -100,16 +101,11 @@ export class Toaster {
     
     const rect = this.getToastRect();
     this.closeBtn = this.getCloseBtn(rect);
-    console.log("RECT: ", rect);
-    console.log("CloseBtn -from onclick(): ", this.closeBtn);
 
     const dx = mx - (this.closeBtn.x); const dy = my - (this.closeBtn.y);
     const d =  Math.sqrt(dx*dx + dy*dy);
     const inside = d <= this.closeBtn.r; 
-
-    console.log("mx: ", mx, "my: ", my);
-    console.log("click/ d: ", d, " | Btb.r: ", this.closeBtn.r,"| inside: ", inside);
-
+    
     if (inside) this.clear();
 
   }
@@ -119,9 +115,12 @@ export class Toaster {
   // ─────────────────────────────────────────────
   render(g) {
     // Drag hint overlay
-    if (!this.toast && this.dragHint) {
-      this.renderHint(g);
+    if (ModalUI.active) {
+      ModalUI.active.showDragHint(g);
+    } if(this.dragHint) {
+      this.renderHint(g);  // current yellow overlay
     }
+
 
     // Toast overlay
     if (this.toast) {
@@ -186,16 +185,17 @@ export class Toaster {
     g.pop();
   }
 
-  renderHint(g) {
+  renderHint(g) {if(!this.dragHint) return;
     const text = this.dragHint.text;
-
+    
     g.push();
-    g.fill(255, 255, 0, 40);
-    g.rect(0, 0, g.width, g.height);
+    g.fill("#eaff004d"); g.rect(0, 0, g.width, g.height);
 
-    g.textAlign(g.CENTER, g.CENTER);
-    g.textSize(22);
-    g.fill("#00c8ff");
+    g.fill("#ba4a4aff");
+    g.rect(g.width/2 - 200, g.height/2 - 15, 400, 30, 
+           8              , 8              ,   8,  8);
+   
+    g.fill("#beff28ff");  g.textSize(22); g.textAlign(g.CENTER, g.CENTER);
     g.text(text, g.width / 2, g.height / 2);
 
     g.pop();

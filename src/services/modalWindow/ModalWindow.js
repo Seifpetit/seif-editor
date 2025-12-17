@@ -8,6 +8,7 @@ export class ModalWindow {
   }
 
   show({ title, content, size = "medium", blocking = false }) {
+    R.ui.modalLock = this.blocking;
     this.active = new ModalInstance({
       title,
       content,
@@ -18,20 +19,26 @@ export class ModalWindow {
     });
   }
 
-  onDrag(mx, my){console.log("1_onDrag passing through ModalWindow from ModalWindow.js");
+  onDrag(mx, my){
     if(this.active) this.active.onDrag(mx, my);
   }
 
   drag() {
-    if (this.active) {console.log("5_drag from modalWindow");
+    if (this.active) {
       this.active.drag();
     }
   }
 
   close() {
+    if (this.active.content && typeof this.active.content.onClose === "function") {
+      //R.ui.modalLock = this.blocking;
+      this.active.content.onClose();
+    }
     if (this.active) {
+      //R.ui.modalLock = this.blocking;
       this.active.startClosing();
     }
+    
   }
 
   update() {
@@ -41,6 +48,7 @@ export class ModalWindow {
 
     if (this.active.isFullyClosed()) {
       this.active = null;
+      R.ui.modalLock = false;
     }
   }
 
@@ -122,17 +130,26 @@ class ModalInstance {
   }
 
   updatePosition(nx, ny) {
-    console.log("7_update");
 
     this.x = nx;
     this.y = ny;
     this.header.setGeometry(this.x, this.y, this.w);
+  }
+  
+  showDragHint(g) {
+    g.push();
+    g.noFill();
+    g.stroke("#00c8ff");
+    g.strokeWeight(3);
+    g.rect(this.x, this.y, this.w, this.h);
+    g.pop();
   }
 
   /*──────────────────────────────────────────*/
   /* UPDATE                                   */
   /*──────────────────────────────────────────*/
   update() {
+    
     if (!this.closing) {
       // fade in
       this.alpha = Math.min(255, this.alpha + this.fadeSpeed);
@@ -181,7 +198,11 @@ class ModalInstance {
 
     if (this.content) {
       g.push();
-      this.content(g, cx, cy, cw, ch);
+      if (typeof this.content === "function") {
+        this.content(g, cx, cy, cw, ch);
+      } else if (this.content && typeof this.content.draw === "function") {
+        this.content.draw(g, cx, cy, cw, ch);
+      }
       g.pop();
     }
   }
@@ -213,7 +234,6 @@ class ModalInstance {
 
 
   onDrag(mx, my) {
-    console.log("2_onDrag passing through ModalInstance");
 
     // if header handled drag start
     if (this.header.onDrag(mx, my)) return true;
@@ -233,6 +253,12 @@ class ModalInstance {
   onClick(mx, my) {
     // Header close button
     if (this.header.onClick(mx, my)) return true;
+
+    // Content click
+    if (this.content && typeof this.content.onClick === "function") {
+      this.content.onClick(mx, my);
+      return true;
+    }
 
     // If blocking → consume all clicks
     return this.blocking;

@@ -2,7 +2,7 @@
 // [BUILDER] Editor mode — grid on left, raw tilesheet (1:1) on right
 // ─────────────────────────────────────────────────────────────────────────────
 import { R } from '../core/runtime.js';
-import { exportLevel, importLevel } from '../core/import-export.js';
+import { exportLevel, importLevel } from '../core/importHandler/import-export.js';
 import { updateRightPanel, renderRightPanel } from '../editor/rightPanel/index.js'; 
 import { updateBottomDock, renderBottomDock } from '../editor/bottomDock/index.js';
 import { updateViewport, renderViewport } from '../editor/viewport/index.js';
@@ -24,9 +24,10 @@ export function renderBuilder(p, { gWorld, gOverlay, gHUD }) {
   gWorld.clear();
   gOverlay.clear();
   gHUD.clear();
-  
+  gWorld.pixelDensity(1);
+
   renderViewport(gWorld);
-  renderRightPanel(gOverlay);
+  renderRightPanel(gWorld);
   renderBottomDock(p);
 
   

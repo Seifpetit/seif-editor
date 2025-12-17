@@ -8,7 +8,7 @@ import { R, updatePanelLayout} from './core/runtime.js';
 import { loadLevel } from './core/levelLoader.js';
 import { updateFrame, renderFrame } from './core/orchestrator.js';
 import { registerKeyboard } from './core/input.js';
-import { handleImportedFiles } from "./core/importRouter.js";
+import { handleImportedFiles } from "./core/importHandler/importRouter.js";
 import { ToasterUI } from './services/Toaster.js';
 import { ModalUI } from './services/modalWindow/ModalWindow.js';
 // ─────────────────────────────────────────────────────────────────────────────
@@ -28,6 +28,7 @@ new window.p5(p => {
     R.atlas.slime_green = p.loadImage("src/assets/slime_green.png");
     R.atlas.slime_purple = p.loadImage("src/assets/slime_purple.png");
 
+    R.layout.assets.load_icon = p.loadImage("src/assets/load-icon.png");
 
     R.layout.assets.cursor_k = p.loadImage("src/assets/pointer_k.png");
     R.layout.assets.cursor_j = p.loadImage("src/assets/pointer_j.png");
@@ -36,7 +37,7 @@ new window.p5(p => {
     R.layout.assets.mark_exlamation_cursor_b = p.loadImage("src/assets/mark_exclamation_pointer_b.png");
   };
 
-  p.setup = async () => {
+  p.setup = async () => { R.p5_instance = p;
     p.createCanvas(window.innerWidth - R.layout.pad, window.innerHeight - R.layout.pad); // "- R.layout.padX" //TEMP
     p.noSmooth(); p.pixelDensity(1); p.canvas.style.cursor = 'none';
 
@@ -109,11 +110,11 @@ new window.p5(p => {
     if (R.cursor.currentPng) p.image(R.cursor.currentPng, m.x, m.y);
 
     if(m.pressed) {
-      console.clear(); console.log("0_drag initiated from main.js");
-      if(!R.ui.modalDrag) {ModalUI.onClick(m.x, m.y);
-      ToasterUI.onClick(m.x, m.y);}
-      ModalUI.onDrag(m.x, m.y);
-      
+      if(!R.ui.modalDrag) {
+        ModalUI.onClick(m.x, m.y);
+        ToasterUI.onClick(m.x, m.y);
+      }
+      ModalUI.onDrag(m.x, m.y);  
     }
     if (!m.pressed && ModalUI.active) {
       ModalUI.active.stopDrag();
@@ -141,7 +142,7 @@ function setupDragAndDrop() {
   cnv.ondragover = e => {
     e.preventDefault();
     R.ui.dragActive = true;
-    ToasterUI.showHint();
+    if(!ModalUI.active) ToasterUI.showHint("You can Drag & Drop Files ...");
   };
 
   cnv.ondragleave = e => {

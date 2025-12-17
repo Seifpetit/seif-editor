@@ -9,7 +9,7 @@ import { Camera } from "../core/camera.js";
 // ----- Runtime state -----
 export const R = {
 
-
+  p5_instance: null,
   audioCtx: new AudioContext(),
 
   RESET_FRAMES: 0,
@@ -76,6 +76,7 @@ export const R = {
 
     topBarButtons: [],
 
+    selectedItem: {id: null},  //currently selected media or effects..
     selectedAsset: {},              // currently selected tile id
     hoveredAsset: {},              // tile id under mouse in palette
 
@@ -87,24 +88,10 @@ export const R = {
       active: false
     },
 
-
-
-    panels: {
-      viewport: null,
-      right: null,
-      bottom: null,
-    },
-
-    hover: {
-      inViewport: false,
-      inRightPanel: false,
-      inBottomDock: false,
-      inHudOverlay: false,
-    },
-
     state: {
       timelineOpen: false,
       libraryOpen: false,
+      error: false,
     },
 
     audio: {
@@ -148,7 +135,8 @@ export const R = {
     image: []      // <-- required for importImage
   },
 
-  
+  assetsVersion: 0,
+
 
 
 

@@ -8,11 +8,11 @@ import { updatePhysicsAll } from './physics.js';
 export function updateFrame(p) {
 
   updateInput(p);
-  if(R.ui.modalLock) {
+  if(R.ui.state.error) {
     R.cursor.currentPng = R.layout.assets.mark_exlamation_cursor_b;
     return;
   }
-  
+  if(R.ui.modalLock) return; console.log("modal lock :", R.ui.modalLock);
   R.cursor.currentPng = R.layout.assets.cursor_b;
   if(R.ui.modalDrag) {R.cursor.currentPng = R.layout.assets.hand_closed; return;}
 

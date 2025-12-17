@@ -74,7 +74,12 @@ export class AudioAssetsPage {
       this.updateWaveView();
     }
   }
-
+  onClick(mx, my) {
+  }
+  onHover(mx, my) {
+  }
+  onDoubleClick(mx, my) {
+  }
   // ─────────────────────────────────────────────
   // RENDER LOOP
   // ─────────────────────────────────────────────

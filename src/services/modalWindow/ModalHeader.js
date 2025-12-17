@@ -55,7 +55,6 @@ export class ModalHeader {
   }
 
   mouseInHeader(mx, my) {
-    console.log("4_check if mouse inside Header - ModalHeader from ModalHeader.js");
     return mx >= this.x &&
       mx <= this.x + this.w &&
       my >= this.y &&
@@ -63,14 +62,10 @@ export class ModalHeader {
   }
 
   onDrag(mx, my) {
-    console.log("3_onDrag passing through ModalHeader");
-
     if (this.mouseInHeader(mx, my)) {
-      console.log("4.1_mouse is inside header");
       this.dragStart(mx, my);
       return true;
     }
-
     return false;
   }
 
@@ -83,7 +78,6 @@ export class ModalHeader {
     const dy = my - cy;
 
     if (dx * dx + dy * dy <= r * r) {
-      console.log('close iht');
       this.onClose();
       return true;
     }
