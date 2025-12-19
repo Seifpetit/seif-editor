@@ -13,10 +13,23 @@ export const R = {
   audioCtx: new AudioContext(),
 
   RESET_FRAMES: 0,
-  mode: "builder",                  // "game" | "builder"
+  mode: "editor",                  // "game" | "editor"
   camera: Camera, // camera position and boubds
   level: null,                   // { width, height, layers: {ground, detail, decoration, collision, ...} }                
   atlas: {},                   // spritesheet image (p5.Image)
+
+  editor: null,
+
+  rightPanel: {
+    book: null,
+    page: null,
+
+    registry: {
+      //EXAMPLE :
+      // TILES: { WORLD_TILESET: instance....}
+      // AUDIO: { Assets: instance, PATTERN: instance, SEQUENCER: instance }
+    }
+  },
 
   device: {
   },
@@ -44,16 +57,7 @@ export const R = {
     
   },
 
-  rightPanel: {
-    book: null,
-    page: null,
-
-    registry: {
-      //EXAMPLE :
-      // TILES: { WORLD_TILESET: instance....}
-      // AUDIO: { Assets: instance, PATTERN: instance, SEQUENCER: instance }
-    }
-  },
+  
 
 
   cursor: { x: 0, y: 0, tileX: 0, tileY: 0, inGrid: false, 

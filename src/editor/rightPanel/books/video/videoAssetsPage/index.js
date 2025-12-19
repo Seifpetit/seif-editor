@@ -2,7 +2,7 @@ import { R } from "../../../../../core/runtime.js";
 import { HeaderBar } from "./components/headerBar.js";
 import { ModalUI } from "../../../../../services/modalWindow/ModalWindow.js";
 import { CamRecTask } from "./features/camRec.js";
-import { AssetItem } from "./components/AssetItem.js";
+import { AssetItem } from "./components/AssetItem/AssetItem.js";
 import { PreviewTask } from "./features/PreviewTask.js";
 import { ImportTask } from "./features/ImportTask.js";
 import { renderCardsView, renderListView, renderEmptyState, updateView } from "./view.js";
@@ -21,7 +21,7 @@ export class VideoAssetsPage {
 
 
     // Local UI state (NOT global)
-    this.mode = "list";       // "list" | "cards" 
+    this.mode = "cards";       // "list" | "cards" 
     this.hoveredId = null;
     this.isDragOver = false;
     this.assetsVersion = R.assetsVersion;
@@ -111,8 +111,8 @@ export class VideoAssetsPage {
   // ─────────────────────────────────────────────
   render(g) {
     g.push();
-
     this.header.render(g, this.mode);
+
     if (this.assetsVersion === 0) {
       renderEmptyState(g, this);
       g.pop();
@@ -135,8 +135,6 @@ export class VideoAssetsPage {
     g.pop();
   }
 
-
-
   syncAssetsIfNeeded() {
 
     // If no change → do nothing
@@ -146,32 +144,29 @@ export class VideoAssetsPage {
       this.items = this.assets.map(asset => new AssetItem(asset)); 
     }
 
-
   }
-
-
 
   dragHighlight(g) {
     g.push();
 
-        // semi-transparent overlay
-        g.fill(255, 255, 0, 30);
-        g.rect(this.x, this.y, this.w, this.h);
+    // semi-transparent overlay
+    g.fill(255, 255, 0, 30);
+    g.rect(this.x, this.y, this.w, this.h);
 
-        // glowing border
-        g.noFill();
-        g.stroke("#00c8ff");
-        g.strokeWeight(3);
-        g.rect(this.x + 2, this.y + this.rowHeight + 2, this.w - 4, this.h - this.rowHeight - 4);
+    // glowing border
+    g.noFill();
+    g.stroke("#00c8ff");
+    g.strokeWeight(3);
+    g.rect(this.x + 2, this.y + this.rowHeight + 2, this.w - 4, this.h - this.rowHeight - 4);
 
-        // text
-        g.noStroke();
-        g.fill("#00c8ff");
-        g.textAlign(g.CENTER, g.CENTER);
-        g.textSize(18);
-        g.text("Drop video files to import", this.x + this.w / 2, this.y + this.h / 2);
+    // text
+    g.noStroke();
+    g.fill("#00c8ff");
+    g.textAlign(g.CENTER, g.CENTER);
+    g.textSize(18);
+    g.text("Drop video files to import", this.x + this.w / 2, this.y + this.h / 2);
 
-        g.pop();
+    g.pop();
   
 
   }
@@ -179,12 +174,18 @@ export class VideoAssetsPage {
   // ─────────────────────────────────────────────
   // INPUT EVENTS
   // ─────────────────────────────────────────────
+  hit(mx, my) {
+    return (mx > this.x && mx < this.x + this.w &&
+            my > this.y && my < this.y + this.h);
+  }
 
   onHover(mx, my) {
+    if (!this.hit(mx, my)) return false;
     for (let item of this.items) item.onHover(mx, my);
   }
 
-  onClick(mx, my) {
+  onClick(mx, my) { 
+    if (!this.hit(mx, my)) return false;
     for (let item of this.items) {
       if (item.onClick(mx, my)) return true;
     }

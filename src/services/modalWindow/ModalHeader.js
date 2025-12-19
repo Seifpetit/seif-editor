@@ -6,6 +6,8 @@ export class ModalHeader {
     this.title = title;
     this.onClose = onClose;
     this.dragStart = drag;
+    this.hover = false;
+
 
     this.x = 0;
     this.y = 0;
@@ -54,7 +56,7 @@ export class ModalHeader {
     this.closeHit = { cx, cy, r };
   }
 
-  mouseInHeader(mx, my) {
+  hit(mx, my) {
     return mx >= this.x &&
       mx <= this.x + this.w &&
       my >= this.y &&
@@ -62,17 +64,23 @@ export class ModalHeader {
   }
 
   onDrag(mx, my) {
-    if (this.mouseInHeader(mx, my)) {
+    if (this.hit(mx, my)) {
       this.dragStart(mx, my);
       return true;
     }
     return false;
   }
 
+  onHover(mx, my) { 
+    if (!this.hit(mx, my)) return false;
+    this.hover = true;
+    return true;
+  }
 
   onClick(mx, my) {
     if (!this.closeHit) return false;
-
+    if (!this.hit(mx, my)) return false;
+    
     const { cx, cy, r } = this.closeHit;
     const dx = mx - cx;
     const dy = my - cy;

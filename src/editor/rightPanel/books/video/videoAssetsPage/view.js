@@ -1,7 +1,7 @@
 
-
-import { R } from "../../../../../core/runtime.js";
-
+// ─────────────────────────────────────────────
+// RENDERING FUNCTIONS FOR VIDEO ASSETS PAGE
+// ─────────────────────────────────────────────
 
 
 
@@ -23,13 +23,11 @@ export function renderListView(g, page) {
   const itemX = page.x + pad; 
   const itemW = page.w - pad * 5; 
   
-  
   let itemY = page.y + page.rowHeight + pad;
   
   let items = page.items;
     for (let item of items) {
       item.setGeometry(itemX, itemY, itemW, itemH, page.mode);
-      item.update();
       item.draw(g);
 
       itemY += (itemH + pad);
@@ -54,13 +52,17 @@ export function renderCardsView(g, page) {
       const y = page.y + page.rowHeight + pad + row * (cardH + pad);
 
       item.setGeometry(x, y, cardW, cardH);
-      item.update();
       item.draw(g, "cards");
 
       i++;
     }
+    for (let item of items) {
+      
+      const ctxZone = item.contextZone;
+      ctxZone.draw(g);
+      
+    }
 }
-
 
 
 export function updateView(page) {

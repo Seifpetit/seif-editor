@@ -57,12 +57,23 @@ export class ModalWindow {
 
     // block the editor beneath
     this.active.render(g);
+  } 
+
+  onHover(mx, my) {
+    if (!this.active) return false;
+    return this.active.onHover(mx, my);
   }
 
   onClick(mx, my) {
     if (!this.active) return false;
     return this.active.onClick(mx, my);
   }
+
+  onDoubleClick(mx, my) {
+    if (!this.active) return false;
+    return this.active.onDoubleClick(mx, my);
+  }
+
 }
 
 
@@ -232,7 +243,6 @@ class ModalInstance {
     R.ui.modalDrag = this.dragging;
   }
 
-
   onDrag(mx, my) {
 
     // if header handled drag start
@@ -245,6 +255,23 @@ class ModalInstance {
     }
 
     return false;
+  }
+
+  /*──────────────────────────────────────────*/
+  /* HOVER HANDLING                           */
+  /*──────────────────────────────────────────*/
+  onHover(mx, my) {
+    // Header close button
+    if (this.header.onHover(mx, my)) return true;
+
+    // Content click
+    if (this.content && typeof this.content.onHover === "function") {
+      this.content.onHover(mx, my);
+      return true;
+    }
+
+    // If blocking → consume all Hovers
+    return this.blocking;
   }
 
   /*──────────────────────────────────────────*/
@@ -263,6 +290,16 @@ class ModalInstance {
     // If blocking → consume all clicks
     return this.blocking;
   }
+
+  onDoubleClick(mx, my) {
+    // Content double click
+    if (this.content && typeof this.content.onDoubleClick === "function") {
+      this.content.onDoubleClick(mx, my);
+      return true;
+    }
+    return false;
+  }
+
 }
 
 

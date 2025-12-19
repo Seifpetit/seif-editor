@@ -53,31 +53,43 @@ export class PalettePage {
       id: cy * TILE_COLS + cx + 1,
       atlasRef: R.ui.selectedPage
     };
-  }
+  } 
 
-  update(atlas) {
-    this.atlas = atlas;
-
-    const m = R.input.mouse;
-    if (!this.atlas) return;
-
+  hit(mx, my) {
     // recalc scale because atlas changed
     this.scale = this.computePaletteScale();
 
     const drawW = this.atlas.width * this.scale;
     const drawH = this.atlas.height * this.scale;
 
-    this.getHoveredAsset(m.x, m.y);
+    //this.getHoveredAsset(m.x, m.y);
 
     const inside =
-      m.x >= this.x && m.x < this.x + drawW &&
-      m.y >= this.y && m.y < this.y + drawH;
+      mx >= this.x && mx < this.x + drawW &&
+      my >= this.y && my < this.y + drawH;
 
     R.cursor.inPalette = inside;
 
-    if (inside && m.pressed && m.button === "left") {
-      R.ui.selectedAsset = R.ui.hoveredAsset;
-    }
+    return inside;
+  }
+
+  onHover(mx, my) {
+    if (!this.atlas || !this.hit(mx, my)) return false;
+    this.getHoveredAsset(mx, my);
+    return true;
+  }
+
+  onClick(mx, my) {
+    if (!this.atlas) return false;
+    if(!this.hit(mx, my)) return false;
+    R.ui.selectedAsset = R.ui.hoveredAsset;
+    return true;
+  }
+
+  update(atlas) {
+    this.atlas = atlas;
+    if (!this.atlas) return;
+
   }
 
   render(g) {

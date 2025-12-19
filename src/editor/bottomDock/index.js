@@ -14,6 +14,8 @@ const dock = {
   panel: new TimelinePanel(),
 }
 
+R.bottomDock = dock;
+
 // ─────────────────────────────────────────────
 // [UPDATE] HUD logic (hotkeys, toggles, etc.)
 // ─────────────────────────────────────────────

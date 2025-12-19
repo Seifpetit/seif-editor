@@ -30,16 +30,34 @@ export class topBarContainer {
     });
   }
 
+  onHover(mx, my) {
+    for (let btn of this.buttons) {
+      if (btn.onHover(mx, my)) return true;
+    }
+    return false;
+  }
+
+  onClick(mx, my) {
+    for (let btn of this.buttons) {
+        if(btn.onClick(mx, my))return true;
+      }
+    return false;
+  }
+
   update() {
     this.buttons.forEach(btn => btn.update());
   }
 
   render(g) {
     g.push();
-    g.fill(30);
-    g.rect(this.x, this.y, this.w, this.h, 10, 10, 0, 0);
+
+    g.fill("#75725cff"); g.rect(this.x, this.y, this.w, this.h, 10, 10, 0, 0);
+
+    g.textAlign(g.CENTER, g.CENTER); g.textSize(20); g.fill("#eca233ff");
+    g.text("SELECT A BOOK", this.x + this.w / 2, this.y + this.h / 2);
 
     this.buttons.forEach(btn => btn.render(g));
+
     g.pop();
   }
 }
@@ -52,24 +70,43 @@ class Button {
     this.x = this.y = this.w = this.h = 0;
   }
 
-  update() {
-    const m = R.input.mouse;
-
+  hit(mx, my) {
     const inside =
-      m.x >= this.x && m.x <= this.x + this.w &&
-      m.y >= this.y && m.y <= this.y + this.h;
+      mx >= this.x && mx <= this.x + this.w &&
+      my >= this.y && my <= this.y + this.h;
+    return inside;
+  }
+  
+  onHover(mx, my) {
+    if (!this.hit(mx, my)) return false;
+    R.ui.hoveredPage = this.page;
+    return true;
+  }
 
-    if (inside && m.pressed && m.button === "left") {
-      R.ui.selectedPage = this.page;
-    }
+  onClick(mx, my) {
+    if (!this.hit(mx, my)) return false;
+    R.ui.selectedPage = this.page;
+    return true;
+  }
+
+  update() {
+
   }
 
   render(g) {
     const isActive = (R.ui.selectedPage === this.page);
+    const isHovered = (R.ui.hoveredPage === this.page);
 
     g.push();
 
-    g.fill(isActive ? "#ffaa00" : "#444");
+    if (isActive) {
+      g.fill("#ffaa00");
+    } else if (isHovered) {
+      g.fill("#433218ff");
+    } else {
+      g.fill("#262626");
+    }
+
     g.rect(this.x, this.y, this.w, this.h, 10, 10, 0, 0);
 
     g.fill(isActive ? "black" : "orange");

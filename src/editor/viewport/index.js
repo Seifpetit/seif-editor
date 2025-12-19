@@ -9,6 +9,9 @@ const viewportPanel = {
   brushBar: new BrushBar(),
 }
 
+// attach to R runtime
+R.viewportPanel = viewportPanel;
+
 // ─────────────────────────────────────────────
 // [UPDATE] HUD logic (hotkeys, toggles, etc.)
 // ─────────────────────────────────────────────

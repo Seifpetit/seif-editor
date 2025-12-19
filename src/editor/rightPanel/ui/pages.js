@@ -15,7 +15,7 @@ export const PAGE_TYPES = {
 export const BOOKS = [
   { label: "Tiles",    ref: "TILES" },
   { label: "Audio",    ref: "AUDIO" },
-  { label: "Video", ref: "VIDEO" },
+  { label: "Video",    ref: "VIDEO" },
   { label: "Logic",    ref: "LOGIC" },
   { label: "Files",    ref: "FILES" },
 ];

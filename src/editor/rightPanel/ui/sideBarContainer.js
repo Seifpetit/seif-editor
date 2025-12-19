@@ -14,16 +14,46 @@ export class sideBarContainer {
 
   setGeometry(x, y, w, h) {
     this.x = x; this.y = y; this.w = w; this.h = h;
+    const count = this.buttons.length;
+    const bh = this.h / count;
+    this.buttons.forEach((btn, i) => {
+      btn.setGeometry(this.x, this.y + i * bh, this.w, bh);
+    });
+  }
+
+  hit(mx, my) {
+    for (let btn of this.buttons) {
+      if (btn.hit(mx, my)) return true;
+    }
+    return false;
+  }
+
+  onHover(mx, my) {
+    for (let btn of this.buttons) {
+      if (btn.onHover(mx, my)) return true;
+    }
+    return false;
+  }
+
+  onClick(mx, my) {
+    for (let btn of this.buttons) { 
+      if (btn.onClick(mx, my)) return true;
+    }
+    return false;
+  }  
+
+  onDoubleClick(mx, my) {
+    for (let btn of this.buttons) {
+      if (btn.onDoubleClick?.(mx, my)) return true;
+    }
+    return false;
   }
 
   update() {
-    const count = this.buttons.length;
-    const bh = this.h / count;
+    
 
-    this.buttons.forEach((btn, i) => {
-      btn.setGeometry(this.x, this.y + i * bh, this.w, bh);
-      btn.update();
-    });
+    for(let btn of this.buttons) btn.update();
+
   }
 
   render(g) {
@@ -35,6 +65,7 @@ export class sideBarContainer {
 class Button {
 
   constructor(label, ref) {
+    this.hover = false;
     this.label = label;
     this.ref   = ref;
     this.x = this.y = this.w = this.h = 0;
@@ -44,26 +75,40 @@ class Button {
     this.x = x; this.y = y; this.w = w; this.h = h;
   }
 
-  update() {
-    const m = R.input.mouse;
-
+  hit(mx, my) {
     const inside =
-      m.x >= this.x && m.x <= this.x + this.w &&
-      m.y >= this.y && m.y <= this.y + this.h;
+      mx >= this.x && mx <= this.x + this.w &&
+      my >= this.y && my <= this.y + this.h;
+    return inside;
+  }
 
-    if (inside) {
-      R.ui.hoveredBook = this.ref;
-      if (m.pressed && m.button === "left") {
-        onBookSelected(this.ref);
-        R.rightPanel.book = this.ref;
-      }
-    }
+  onHover(mx, my) {
+    this.hover = false;
+    if (!this.hit(mx, my)) return false;
+    this.hover = true;
+    R.ui.hoveredBook = this.ref;
+    return true;
+  }
+
+  onClick(mx, my) {
+    if (!this.hit(mx, my)) return false;
+    onBookSelected(this.ref);
+    return true;
+  }
+
+  onDoubleClick(mx, my) {
+    if (!this.hit(mx, my)) return false;
+    onBookSelected(this.ref);
+    return true;
+  }
+
+  update() {
+    
   }
 
   render(g) {
-    const isActive  = (R.ui.selectedBook === this.ref);
-    const isHover   = (R.ui.hoveredBook === this.ref);
-
+    const isActive = (R.ui.selectedBook === this.ref);
+    const isHover  = (R.ui.hoveredBook  === this.ref);
     g.push();
     g.noStroke();
 
@@ -83,4 +128,5 @@ class Button {
 
     g.pop();
   }
+
 }

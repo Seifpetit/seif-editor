@@ -1,4 +1,4 @@
-# Seif Platformer — 2D Game Editor & Engine
+# Seif editor — 2D Game/Media Editor
 
 ## 1. Overview
 
