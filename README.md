@@ -20,7 +20,7 @@ This repository demonstrates how to design and scale an internal editor from fir
 
 ## Live Demo
 
-👉 https://seifpetit.github.io/seif-platformer  
+👉 https://seifpetit.github.io/seif-editor 
 
 🎨 Tile Painting & Grid Interaction
 📁 Drag-and-Drop Asset Importing
