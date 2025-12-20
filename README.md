@@ -1,11 +1,5 @@
-Locked.
-**Primary signal:** *“This person can build serious internal tools from scratch.”*
 
-Below is a **clean, application-ready README pass** aligned to that signal. It’s concise, technical, and credible to tooling teams. I’ve left **two marked slots** where your voice can add a sentence later—only where it adds leverage.
 
----
-
-## README (Draft v1 — Tooling-First)
 
 ### Seif Editor
 

@@ -89,7 +89,7 @@ export function showHelpText(g) {
 function ensureGitHubLink(p) {
 
   
-  if (R.mode !== "builder" || !R.hud) return hideGitHubLink();
+  if (R.mode !== "editor" || !R.hud) return hideGitHubLink();
 
 
   if (!R.hud.ghlink) {
