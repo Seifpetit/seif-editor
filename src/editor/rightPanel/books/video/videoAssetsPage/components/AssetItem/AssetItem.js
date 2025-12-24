@@ -36,7 +36,9 @@ export class AssetItem {
 
     // Hit zones
     this.renameZone = new RenameZone(); 
-    this.contextZone = new ContextZone();
+    this.contextZone = new ContextZone({
+      onMessage: msg => this.recieve(msg)
+    });
   }
 
   
@@ -69,6 +71,24 @@ export class AssetItem {
 
     this.contextZone.setGeometry(contextZoneX, contextZoneY, contextZoneW, contextZoneH);
   }
+
+  recieve(msg) {
+    
+    if (msg === "preview") {
+      // open preview modal
+      const task = new PreviewTask(this.asset);
+      console.log(msg, task);
+      ModalUI.show({
+        title: this.asset.name,
+        size: "large",
+        blocking: true,
+        content: task
+      });
+      return;
+    }
+
+  }
+
 
 
   update() {
@@ -112,8 +132,6 @@ export class AssetItem {
 
     if(this.hit(mx, my)) this.hover = true;
 
-    
-
     // zones
 
     this.heroSpace.onHover(mx, my);
@@ -124,8 +142,10 @@ export class AssetItem {
 
   onClick(mx, my) {
 
-    if(!this.hit(mx, my)) return false;
-
+    if(!this.hit(mx, my) && !this.contextZone.open) return false;
+    if(!this.hit(mx, my) && this.contextZone.open) {
+       if(this.contextZone.onClick(mx, my)) return true;
+    }
     // Context button
     if(this.contextZone.onClick(mx, my)) return true;
     // Rename zone
@@ -141,15 +161,7 @@ export class AssetItem {
   }
 
   onDoubleClick(mx, my) {
-    // open preview modal
-    const task = new PreviewTask(this.asset);
-
-    ModalUI.show({
-      title: this.asset.name,
-      size: "large",
-      blocking: true,
-      content: task
-    });
+    
   }
 
 }

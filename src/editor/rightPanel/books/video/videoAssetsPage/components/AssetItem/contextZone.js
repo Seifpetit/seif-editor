@@ -8,7 +8,9 @@ const DEFAULT_CONTEXT_TASKS = [
 // ───────────────────────────────────────────────────────────────────────────  
 
 export class ContextZone {
-  constructor() {
+  constructor( {onMessage} ) {
+    this.onMessage = onMessage;
+
     this.x = 0; this.y = 0; this.w = 0; this.h = 0;
     this.taskH = 25; this.taskW = 200;
     
@@ -31,7 +33,11 @@ export class ContextZone {
   } 
 
   initTasks(tasks = DEFAULT_CONTEXT_TASKS) {
-    for(let t of tasks) this.tasks.push( new ContextTask(t.type, t.label) );
+    for(let t of tasks) this.tasks.push( new ContextTask({
+      type:  t.type, 
+      label: t.label, 
+      onTask: msg => this.onMessage(msg)
+    }) );
   }
 
   hit(mx, my){
@@ -48,13 +54,15 @@ export class ContextZone {
   onClick(mx, my){
 
     if(!this.hit(mx, my) && !this.open) return false;
-    if(this.hit(mx, my))  this.open = !this.open;
+    if(this.hit(mx, my)) this.open = !this.open;
 
-    if(this.open) {
+    if(this.open) { 
       for(let task of this.tasks) {
         if(task.onClick(mx, my)) return true;
       }
     }
+    
+
     return true;
    
     
@@ -69,6 +77,8 @@ export class ContextZone {
     // future: handle button hover/click  
 
     if(!this.open) return;
+
+    
 
   }
 
@@ -90,7 +100,7 @@ export class ContextZone {
     
     g.fill(this.open?"#ff0000ff":"#151514ff"); g.textSize(20); g.textAlign(g.CENTER, g.CENTER);
     g.text("⁝", this.x + this.w / 2, this.y + this.h / 2 + 1); 
-    if(this.open) console.log("Drawing context zone:", this.x, this.y, this.w, this.h);
+    //if(this.open) console.log("Drawing context zone:", this.x, this.y, this.w, this.h);
 
     g.pop();
 
@@ -100,7 +110,8 @@ export class ContextZone {
 }
 
 class ContextTask {
-  constructor(type, label) {
+  constructor( {type, label, onTask} ) {
+    this.onTask = onTask;
     this.type = type;
     this.label = label;
     this.hover = false;
@@ -126,9 +137,12 @@ class ContextTask {
     this.hover = true;
   }
 
-  onClick(mx, my){
-    if(!this.hit(mx, my)) return false;
-    console.log("Context task clicked:", this.type);
+  onClick(mx, my){console.log('context click', this.type);
+    if(!this.hit(mx, my)) {
+      console.log("TYPE: ", this.type , " => ",!this.hit(mx, my));
+      return false;}
+    
+    this.onTask(this.type);
     // further action handling can be implemented here
     return true;
   }

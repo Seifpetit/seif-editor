@@ -1,6 +1,4 @@
 
-
-
 ### Seif Editor
 
 **Custom 2D engine with integrated media & gameplay authoring**
@@ -9,12 +7,12 @@
 
 ## Overview
 
-Seif Editor is a custom-built internal tooling platform for authoring interactive 2D experiences.
+This is a cutom engine with media and gameplay authoring editor.
 It combines a lightweight runtime, a modular editor UI, and a deterministic input/render pipeline into a single system designed for clarity, extensibility, and long-term maintainability.
 
-The project focuses on **engineering the tool itself** rather than shipping a single product: custom input routing, panel composition, asset pipelines, and render-order control are all implemented from scratch without external frameworks.
+My focus was on **engineering the tool itself** rather than shipping a single product, so this is not a finished product, but it already has strong stable foundation: custom input routing, panel composition, asset pipelines, and render-order control are all implemented from scratch without external frameworks.
 
-This repository demonstrates how to design and scale an internal editor from first principles.
+This repository demonstrates how to design and scale an internal editor into 50+ files without mental overload or chaos.
 
 ---
 
@@ -22,16 +20,14 @@ This repository demonstrates how to design and scale an internal editor from fir
 
 👉 https://seifpetit.github.io/seif-editor 
 
-🎨 Tile Painting & Grid Interaction
-📁 Drag-and-Drop Asset Importing
-
-![Gameplay Demo](./docs/editor.gif)
+🎨 Tile Painting & Grid Interaction     ![Gameplay Demo](./docs/editor.gif)
+📁 Drag-and-Drop Asset Importing     
 
 ---
 
 ## Core Capabilities
 
-* **Custom runtime loop** (update → route input → render)
+* **Custom runtime loop** (input capture → update → render)
 * **Centralized input routing** (click / hover / double-click, no ghost events)
 * **Modular editor panels** (viewport, right panel, bottom dock)
 * **Asset management system** (video, audio, tilesets)

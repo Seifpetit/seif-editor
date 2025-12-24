@@ -66,7 +66,12 @@ function e_routeHOVER(m) {
 function e_routeClick(m) {
   const editor = getPanels();
   const RIGHT_PANEL = editor.rightPanel;
+
+  //CLEAR LOGS EACH CLICK
+  console.clear();
   console.log("Routing click at:", m.x, m.y);
+  //TEMP LOGS
+
   // Check if any modal is open
   if(ModalUI.onClick(m.x, m.y)) return;
   // Route to right panel

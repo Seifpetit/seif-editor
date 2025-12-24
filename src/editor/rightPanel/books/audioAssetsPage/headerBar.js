@@ -65,11 +65,13 @@ export class HeaderBar {
     this.btnCards.render(g, currentMode === "cards");
     this.btnWave.render(g,  currentMode === "wave");
   }
+
 }
 
 
 export class UIButton {
   constructor({ label, role, onEvent }) {
+
     this.label = label;
     this.role  = role;
     this.onEvent = onEvent;
@@ -99,6 +101,7 @@ export class UIButton {
   }
 
   render(g, isActive = false) {
+
     g.push();
     g.fill("#333");
     if(this.hovered) {
@@ -112,5 +115,6 @@ export class UIButton {
     g.text(this.label, this.x + this.w/2, this.y + this.h/2);
 
     g.pop();
+    
   }
 }
