@@ -16,6 +16,7 @@ R.viewportPanel = viewportPanel;
 // [UPDATE] HUD logic (hotkeys, toggles, etc.)
 // ─────────────────────────────────────────────
 export function updateViewport(p) {
+  
   if (R.ui.modalLock) return;  // freeze editor input when popup active
   const G = R.layout.panels.viewport;
   const PAD = R.layout.pad;

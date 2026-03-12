@@ -1,4 +1,12 @@
 
+
+![Gameplay Demo](./docs/editor.gif)
+🎨 Tile Painting & Grid Interaction 
+📁 Drag-and-Drop Asset Importing     
+## Live Demo
+
+👉 https://seifpetit.github.io/seif-editor 
+
 ### Seif Editor
 
 **Custom 2D engine with integrated media & gameplay authoring**
@@ -14,16 +22,6 @@ My focus was on **engineering the tool itself** rather than shipping a single pr
 
 This repository demonstrates how to design and scale an internal editor into 50+ files without mental overload or chaos.
 
----
-
-## Live Demo
-
-👉 https://seifpetit.github.io/seif-editor 
-
-🎨 Tile Painting & Grid Interaction     ![Gameplay Demo](./docs/editor.gif)
-📁 Drag-and-Drop Asset Importing     
-
----
 
 ## Core Capabilities
 
