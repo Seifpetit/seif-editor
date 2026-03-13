@@ -1,50 +1,60 @@
-import { R } from "../../../../../../core/runtime.js";
+// UIButton.js
+// Leaf node — no children.
+// Receives hover/click via events from parent, does NOT poll R.input directly.
 
-export class UIButton {
+import { UIElement } from "../../../../../../core/ui/UIElement.js";
+
+export class UIButton extends UIElement {
   constructor({ label, role, onEvent }) {
-    this.label = label;
-    this.role  = role;
+    super();
+    this.label   = label;
+    this.role    = role;
     this.onEvent = onEvent;
     this.hovered = false;
-
-    this.x = this.y = this.w = this.h = 0;
+    this.active  = false;
   }
 
-  setGeometry(x, y, w, h) {
-    this.x = x; this.y = y;
-    this.w = w; this.h = h;
+  // ─────────────────────────────────────────────
+  // INPUT
+  // ─────────────────────────────────────────────
+
+  onHover(mx, my) {
+    this.hovered = this.hit(mx, my);
+    return this.hovered;
   }
 
-  update() {
-    const m = R.input.mouse;
-
-    const inside =
-      m.x >= this.x &&
-      m.x <= this.x + this.w &&
-      m.y >= this.y &&
-      m.y <= this.y + this.h;
-     this.hovered = inside;
-
-    if (inside && m.pressed && m.button === "left") {
-      const message = { type: "click", role: this.role };
-      this.onEvent(message);
-    }
+  onClick(mx, my) {
+    if (!this.hit(mx, my)) return false;
+    this.onEvent?.({ type: "click", role: this.role });
+    return true;
   }
 
-  render(g, isActive = false) {
+  // Clear hover when parent stops routing to this button
+  onHoverExit() {
+    this.hovered = false;
+  }
+
+  // ─────────────────────────────────────────────
+  // RENDER
+  // ─────────────────────────────────────────────
+
+  render(g) {
+    if (!this.visible) return;
     g.push();
-    g.fill("#333");
-    if(this.hovered) {
-      g.fill("#f7ae1b94");
-      
-    }if(isActive) g.fill("#ffaa00");
+
+    // Background
+    if (this.active)       g.fill("#ffaa00");
+    else if (this.hovered) g.fill("#f7ae1b94");
+    else                   g.fill("#333");
+
+    g.noStroke();
     g.rect(this.x, this.y, this.w, this.h);
 
-    g.fill(isActive ? "black" : "orange");
+    // Label
+    g.fill(this.active ? "black" : "orange");
     g.textAlign(g.CENTER, g.CENTER);
-    g.text(this.label, this.x + this.w/2, this.y + this.h/2);
+    g.text(this.label, this.x + this.w / 2, this.y + this.h / 2);
 
     g.pop();
   }
 }
-

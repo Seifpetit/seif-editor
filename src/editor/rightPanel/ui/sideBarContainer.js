@@ -1,93 +1,24 @@
+// sideBarContainer.js
 import { R } from "../../../core/runtime.js";
+import { UIElement } from "../../../core/ui/UIElement.js";
 import { BOOKS } from "../ui/pages.js";
 import { onBookSelected } from "../index.js";
 
-export class sideBarContainer {
-
-  constructor() {
-    this.x = this.y = this.w = this.h = 0;
-    this.buttons = [];
-
-    for (let b of BOOKS)
-      this.buttons.push(new Button(b.label, b.ref));
-  }
-
-  setGeometry(x, y, w, h) {
-    this.x = x; this.y = y; this.w = w; this.h = h;
-    const count = this.buttons.length;
-    const bh = this.h / count;
-    this.buttons.forEach((btn, i) => {
-      btn.setGeometry(this.x, this.y + i * bh, this.w, bh);
-    });
-  }
-
-  hit(mx, my) {
-    for (let btn of this.buttons) {
-      if (btn.hit(mx, my)) return true;
-    }
-    return false;
-  }
-
-  onHover(mx, my) {
-    for (let btn of this.buttons) {
-      if (btn.onHover(mx, my)) return true;
-    }
-    return false;
-  }
-
-  onClick(mx, my) {
-    for (let btn of this.buttons) { 
-      if (btn.onClick(mx, my)) return true;
-    }
-    return false;
-  }  
-
-  onDoubleClick(mx, my) {
-    for (let btn of this.buttons) {
-      if (btn.onDoubleClick?.(mx, my)) return true;
-    }
-    return false;
-  }
-
-  update() {
-    
-
-    for(let btn of this.buttons) btn.update();
-
-  }
-
-  render(g) {
-    if (!g) return;
-    for (let btn of this.buttons) btn.render(g);
-  }
-}
-
-class Button {
-
+// ─────────────────────────────────────────────
+// BOOK BUTTON — leaf node
+// ─────────────────────────────────────────────
+class BookButton extends UIElement {
   constructor(label, ref) {
-    this.hover = false;
+    super();
     this.label = label;
     this.ref   = ref;
-    this.x = this.y = this.w = this.h = 0;
-  }
-
-  setGeometry(x, y, w, h) {
-    this.x = x; this.y = y; this.w = w; this.h = h;
-  }
-
-  hit(mx, my) {
-    const inside =
-      mx >= this.x && mx <= this.x + this.w &&
-      my >= this.y && my <= this.y + this.h;
-    return inside;
+    this.hovered = false;
   }
 
   onHover(mx, my) {
-    this.hover = false;
-    if (!this.hit(mx, my)) return false;
-    this.hover = true;
-    R.ui.hoveredBook = this.ref;
-    return true;
+    this.hovered = this.hit(mx, my);
+    if (this.hovered) R.ui.hoveredBook = this.ref;
+    return this.hovered;
   }
 
   onClick(mx, my) {
@@ -102,31 +33,45 @@ class Button {
     return true;
   }
 
-  update() {
-    
-  }
-
   render(g) {
-    const isActive = (R.ui.selectedBook === this.ref);
-    const isHover  = (R.ui.hoveredBook  === this.ref);
+    const isActive = R.ui.selectedBook === this.ref;
+    const isHover  = R.ui.hoveredBook  === this.ref;
+
     g.push();
     g.noStroke();
 
-    if (isActive) {
-      g.fill("orange");
-    } else if (isHover) {
-      g.fill("#43321873");
-    } else {
-      g.fill("#262626");
-    }
+    if (isActive)     g.fill("orange");
+    else if (isHover) g.fill("#43321873");
+    else              g.fill("#262626");
 
     g.rect(this.x, this.y, this.w, this.h, 6);
 
     g.fill(isActive ? "black" : "orange");
     g.textAlign(g.CENTER, g.CENTER);
-    g.text(this.label, this.x + this.w/2, this.y + this.h/2);
-
+    g.text(this.label, this.x + this.w / 2, this.y + this.h / 2);
     g.pop();
   }
+}
 
+// ─────────────────────────────────────────────
+// SIDEBAR CONTAINER — parent node
+// ─────────────────────────────────────────────
+export class sideBarContainer extends UIElement {
+  constructor() {
+    super();
+    for (const b of BOOKS) {
+      this.addChild(new BookButton(b.label, b.ref));
+    }
+  }
+
+  setGeometry(x, y, w, h) {
+    super.setGeometry(x, y, w, h);
+    const bh = h / this.children.length;
+    this.children.forEach((btn, i) => {
+      btn.setGeometry(x, y + i * bh, w, bh);
+    });
+  }
+
+  // UIElement base handles propagation to children automatically
+  // Only override if you need custom behaviour beyond that
 }

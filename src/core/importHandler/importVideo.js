@@ -5,6 +5,10 @@ import { R } from "../runtime.js";
 // Core video importer – reliable thumbnail extraction
 //
 export async function importVideo(file) {
+  console.log("file:", file.name, file.type, file.size);
+  const url = URL.createObjectURL(file);
+  console.log("blob url:", url);
+
   return new Promise((resolve, reject) => {
 
     const url = URL.createObjectURL(file);
@@ -57,7 +61,8 @@ export async function importVideo(file) {
           });
 
         } catch (err) {
-          reject(err);
+          console.log("video error code:", video.error?.code, video.error?.message);
+          reject("Failed to load video");
         }
       };
     };
