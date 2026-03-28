@@ -1,5 +1,5 @@
 // headerBar.js
-import { UIElement } from "../../../../../../../core/ui/UIElement.js";
+import { UIElement } from "../../../../../../core/ui/UIElement.js";
 import { UIButton } from "./UIButton.js";
 
 export class HeaderBar extends UIElement {
